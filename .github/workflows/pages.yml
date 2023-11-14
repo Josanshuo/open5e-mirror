@@ -43,7 +43,8 @@ jobs:
         run: npm ci
 
       - name: Update config
-        run: sed "2atarget: 'static'," nuxt.config.ts 
+        run: |
+          sed "2atarget: 'static'," nuxt.config.ts 
 
       - name: Build
         run: npm run build
