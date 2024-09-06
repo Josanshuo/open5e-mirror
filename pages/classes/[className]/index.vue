@@ -41,7 +41,7 @@
         {{ classData.prof_skills }}
       </p>
 
-      <h3>The {{ className }}</h3>
+      <h3>The {{ classData.name }}</h3>
       <md-viewer :text="classData.table" />
     </section>
 
@@ -53,7 +53,7 @@
       <h2>{{ classData.subtypes_name }}</h2>
       <ul v-for="archetype in classData.archetypes" :key="archetype">
         <li>
-          <nuxt-link :to="`${classData.slug}/${archetype.slug}`" tag="a">
+          <nuxt-link :to="`${classData.slug}/${archetype.slug}`">
             {{ archetype.name }}
           </nuxt-link>
         </li>

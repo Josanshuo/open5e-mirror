@@ -1,31 +1,21 @@
 <template>
   <section class="docs-container container">
-    <h1>Equipment</h1>
-
-    <div v-if="equipmentSections" class="docs-toc">
-      <ul>
-        <li v-for="section in equipmentSections" :key="section.slug">
-          <nuxt-link tag="a" :to="`/equipment/${section.slug}`">
-            {{ section.name }}
-          </nuxt-link>
-        </li>
-      </ul>
-      <div
-        v-if="equipmentSections.length == 0"
-        class="flex w-full flex-wrap pt-2 text-lg"
-      >
-        <div vclass="flex w-full">
-          There are no items for this category that align with the corresponding
-          sources you selected.
-        </div>
-        <div class="flex w-full pt-2">
-          Please edit your selected sources for more results.
-        </div>
-      </div>
+    <div class="filter-header-wrapper">
+      <h1 class="filter-header">Equipment</h1>
     </div>
+    <api-results-table
+      v-model="filter"
+      endpoint="characters"
+      :api-endpoint="API_ENDPOINTS.sections"
+      :cols="['document__title', 'document__slug']"
+    />
   </section>
 </template>
 
 <script setup>
-const { data: equipmentSections } = useSections('Equipment');
+import ApiResultsTable from '~/components/ApiResultsTable.vue';
+
+const filter = ref({
+  parent__in: 'Equipment',
+});
 </script>

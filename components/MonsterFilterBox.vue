@@ -1,49 +1,55 @@
 <template>
   <!-- FILTER BOX -->
-  <div class="filter-header-wrapper flex flex-wrap bg-smoke px-2">
+  <div
+    class="filter-header-wrapper flex flex-wrap bg-gray-50 px-2 dark:bg-slate-900 dark:text-white"
+  >
     <div class="bg-blue flex w-full flex-wrap align-middle">
       <label for="monsterName" class="pt-1 font-bold md:w-1/6"
         >MONSTER NAME:</label
       >
       <input
         id="monsterName"
-        v-model="filters.name"
+        :value="filter.name__icontains"
+        placeholder="Any"
         name="monsterName"
-        class="mt-2 w-1/2 rounded-md px-2 ring-1 ring-blood focus:ring-2 focus:ring-blood md:w-5/6"
+        class="mt-2 w-1/2 rounded-md px-2 ring-1 ring-gray-500 focus:ring-2 focus:ring-blood dark:bg-slate-700 dark:text-white md:w-5/6"
+        @input="updateFilter('name__icontains', $event.target.value)"
       />
       <span class="flex w-full font-bold">CHALLENGE RATING</span>
       <div class="flex w-full px-1 md:w-1/2">
         <label for="challengeRtgLow" class="w-1/2">From:</label>
         <select
           id="challengeRtgLow"
-          v-model="filters.challengeLow"
+          :value="filter.cr__gte"
           name="challengeRtgLow"
-          class="w-1/2 rounded-md ring-1 ring-blood focus:ring-2 focus:ring-blood"
+          class="w-1/2 rounded-md ring-1 ring-gray-500 focus:ring-2 focus:ring-blood dark:bg-slate-700 dark:text-white"
+          @input="updateFilter('cr__gte', $event.target.value)"
         >
-          <option :key="null" :value="null" text="Any"></option>
+          <option :key="''" :value="''" text="Any" />
           <option
             v-for="[label, value] in MONSTER_CHALLENGE_RATINGS_MAP"
             :key="value"
             :value="value"
             v-text="label"
-          ></option>
+          />
         </select>
       </div>
       <div class="flex w-full px-1 md:w-1/2">
         <label for="challengeRtgHigh" class="w-1/2">To:</label>
         <select
           id="challengeRtgHigh"
-          v-model="filters.challengeHigh"
+          :value="filter.cr__lte"
           name="challengeRtgHigh"
-          class="w-1/2 rounded-md ring-1 ring-blood focus:ring-2 focus:ring-blood"
+          class="w-1/2 rounded-md ring-1 ring-gray-500 focus:ring-2 focus:ring-blood dark:bg-slate-700 dark:text-white"
+          @input="updateFilter('cr__lte', $event.target.value)"
         >
-          <option :key="null" :value="null" text="Any"></option>
+          <option :key="''" :value="''" text="Any" />
           <option
             v-for="[label, value] in MONSTER_CHALLENGE_RATINGS_MAP"
             :key="value"
             :value="value"
             v-text="label"
-          ></option>
+          />
         </select>
       </div>
     </div>
@@ -53,26 +59,30 @@
         <label for="hpLow" class="w-1/2">From (low):</label>
         <input
           id="hpLow"
-          v-model="filters.hpLow"
+          :value="filter.hit_points__gte"
+          placeholder="Any"
           type="number"
           min="0"
           max="9999"
           step="1"
           name="hpLow"
-          class="w-1/2 rounded-md px-2 ring-1 ring-blood focus:ring-2 focus:ring-blood"
+          class="w-1/2 rounded-md px-2 ring-1 ring-gray-500 focus:ring-2 focus:ring-blood dark:bg-slate-700 dark:text-white"
+          @input="updateFilter('hit_points__gte', $event.target.value)"
         />
       </div>
       <div class="flex w-full px-1 md:w-1/2">
         <label for="hpHigh" class="w-1/2">To (high):</label>
         <input
           id="hpHigh"
-          v-model="filters.hpHigh"
+          :value="filter.hit_points__lte"
+          placeholder="Any"
           type="number"
           min="0"
           max="9999"
           step="1"
           name="hpHigh"
-          class="w-1/2 rounded-md px-2 ring-1 ring-blood focus:ring-2 focus:ring-blood"
+          class="w-1/2 rounded-md px-2 ring-1 ring-gray-500 focus:ring-2 focus:ring-blood dark:bg-slate-700 dark:text-white"
+          @input="updateFilter('hit_points__lte', $event.target.value)"
         />
       </div>
     </div>
@@ -80,16 +90,13 @@
       <label for="size" class="w-1/2 font-bold">SIZE:</label>
       <select
         id="size"
-        v-model="filters.size"
+        :value="filter.size"
         name="size"
-        class="w-1/2 rounded-md ring-1 ring-blood focus:ring-2 focus:ring-blood"
+        class="w-1/2 rounded-md ring-1 ring-gray-500 focus:ring-2 focus:ring-blood dark:bg-slate-700 dark:text-white"
+        @input="updateFilter('size', $event.target.value)"
       >
-        <option :key="null" :value="null" text="Any"></option>
-        <option
-          v-for="size in MONSTER_SIZES_LIST"
-          :key="size"
-          v-text="size"
-        ></option>
+        <option :key="''" :value="''" text="Any" />
+        <option v-for="size in MONSTER_SIZES_LIST" :key="size" v-text="size" />
       </select>
     </div>
     <div class="flex w-full flex-wrap pt-4 md:w-1/2">
@@ -97,51 +104,26 @@
         <label for="type" class="w-full font-bold">TYPE:</label>
         <select
           id="type"
-          v-model="filters.type"
+          :value="filter.type"
           name="type"
-          class="w-full rounded-md ring-1 ring-blood focus:ring-2 focus:ring-blood"
+          class="w-full rounded-md ring-1 ring-gray-500 focus:ring-2 focus:ring-blood dark:bg-slate-700 dark:text-white"
+          @input="updateFilter('type', $event.target.value)"
         >
-          <option :key="null" :value="null" text="Any"></option>
+          <option :key="''" :value="''" text="Any" />
           <option
             v-for="monsterType in MONSTER_TYPES_LIST"
             :key="monsterType"
             v-text="monsterType"
-          ></option>
+          />
         </select>
-      </div>
-    </div>
-    <div class="flex w-full flex-wrap pt-4">
-      <div class="flex w-full justify-end">
-        <button
-          class="rounded-md bg-fog p-1 text-blood outline outline-1 outline-blood hover:bg-blood hover:text-fog"
-          @click="clearFilters()"
-        >
-          <Icon name="heroicons:x-mark" class="mb-1 mr-1" />
-          Clear Filters
-        </button>
       </div>
     </div>
   </div>
   <!-- END FILTER BOX -->
 </template>
 <script setup>
-const filters = defineModel({
-  name: null,
-  challengeLow: null,
-  challengeHigh: null,
-  hpLow: null,
-  hpHigh: null,
-  size: null,
-  type: null,
+const props = defineProps({
+  filter: { type: Object, default: copyDefaultMonsterFilter() },
+  updateFilter: { type: Function, required: true },
 });
-
-function clearFilters() {
-  filters.value.name = null;
-  filters.value.challengeLow = null;
-  filters.value.challengeHigh = null;
-  filters.value.hpLow = null;
-  filters.value.hpHigh = null;
-  filters.value.size = null;
-  filters.value.type = null;
-}
 </script>

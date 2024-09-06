@@ -20,18 +20,22 @@
         </button>
       </div>
     </div>
+
     <img
       v-if="mode !== 'compact' && monster.img_main"
       :src="monster.img_main"
       class="img-main"
     />
     <p class="italic">
-      <span>
-        {{
-          `${monster.size} ${monster.type}${
-            monster.subtype ? ` (${monster.subtype})` : ''
-          }, ${monster.alignment}`
-        }}
+      <span>{{ `${monster.size} ${monster.type}` }}</span>
+      <span
+        v-if="monster.subtype"
+        class="before:content-['_('] after:content-[')']"
+      >
+        {{ monster.subtype }}
+      </span>
+      <span v-if="monster.alignment" class="before:content-[',_']">
+        {{ monster.alignment }}
       </span>
       <source-tag
         v-show="monster.document__slug"
@@ -39,7 +43,7 @@
         :text="monster.document__slug"
       />
     </p>
-    <hr />
+
     <section>
       <ul>
         <li>
@@ -52,7 +56,13 @@
         </li>
         <li>
           <span class="font-bold after:content-['_']">Hit Points</span>
-          {{ `${monster.hit_points} (${monster.hit_dice})` }}
+          <span class="after:content-['_']">{{ monster.hit_points }}</span>
+          <span
+            class="cursor-pointer font-bold text-blood hover:text-black dark:hover:text-fog"
+            @click="useDiceRoller(monster.hit_dice)"
+          >
+            {{ `(${monster.hit_dice})` }}
+          </span>
         </li>
         <li>
           <span class="font-bold after:content-['_']">Speed</span>
@@ -79,83 +89,17 @@
       <ul class="flex items-center gap-4 text-center">
         <li v-for="ability in monster.abilities" :key="ability.name">
           <span class="block font-bold uppercase">{{ ability.shortName }}</span>
-          {{ `${ability.score} (${ability.modifier})` }}
+          <span class="after:content-['_']">{{ ability.score }}</span>
+          <span
+            class="cursor-pointer font-bold text-blood hover:text-black dark:hover:text-fog"
+            @click="useDiceRoller(ability.modifier)"
+          >
+            {{ `(${ability.modifier})` }}
+          </span>
         </li>
       </ul>
     </section>
 
-    <hr />
-
-    <!-- SAVING THROWS AND ATTRIBUTES-->
-    <section>
-      <ul>
-        <li v-if="monster.abilities.filter((a) => a.save).length">
-          <span class="font-bold after:content-['_']">Saving Throws</span>
-
-          <span
-            v-for="ability in monster.abilities.filter((a) => a.save)"
-            :key="ability.name"
-            class="after:content-[',_'] last:after:content-[]"
-          >
-            {{ uppercaseFirstLetter(ability.shortName) }}
-
-            {{ formatMod(ability.save) }}
-          </span>
-        </li>
-        <li v-if="monster.skills">
-          <span class="font-bold after:content-['_']">Skills</span>
-
-          <span
-            v-for="(score, skill) in monster.skills"
-            :key="skill"
-            class="after:content-[',_'] last:after:content-[]"
-          >
-            {{ uppercaseFirstLetter(skill) }}
-
-            {{ formatMod(score) }}
-          </span>
-        </li>
-
-        <li v-if="monster.damage_vulnerabilities">
-          <span class="font-bold after:content-['_']"
-            >Damage Vulnerabilities</span
-          >
-          {{ monster.damage_vulnerabilities }}
-        </li>
-
-        <li v-if="monster.damage_resistances">
-          <span class="font-bold after:content-['_']">Damage Resistances</span>
-          {{ monster.damage_resistances }}
-        </li>
-
-        <li v-if="monster.damage_immunities">
-          <span class="font-bold after:content-['_']">Damage Immunities</span>
-          {{ monster.damage_immunities }}
-        </li>
-
-        <li v-if="monster.condition_immunities">
-          <span class="font-bold after:content-['_']">
-            Condition Immunities
-          </span>
-          {{ monster.condition_immunities }}
-        </li>
-
-        <li v-if="monster.senses">
-          <span class="font-bold after:content-['_']">Senses</span>
-          {{ monster.senses }}
-        </li>
-
-        <li v-if="monster.languages">
-          <span class="font-bold after:content-['_']">Languages</span>
-          {{ monster.languages }}
-        </li>
-
-        <li v-if="monster.challenge_rating">
-          <span class="font-bold after:content-['_']">Challenge</span>
-          <challenge-render :challenge="monster.challenge_rating" />
-        </li>
-      </ul>
-    </section>
     <hr />
 
     <!-- Monster Special Abilities -->
@@ -166,17 +110,17 @@
         class="action-block"
       >
         <span class="font-bold after:content-['._']">{{ ability.name }}</span>
-        <md-viewer :inline="true" :text="ability.desc" />
+        <md-viewer :inline="true" :text="ability.desc" :use-roller="true" />
       </p>
     </section>
 
     <!-- Monster Actions -->
     <section v-if="monster.actions">
       <h2>Actions</h2>
-      <ul>
+      <ul id="actions-list">
         <li v-for="action in monster.actions" :key="action.name" class="my-1">
           <span class="font-bold after:content-['_']">{{ action.name }}. </span>
-          <md-viewer :inline="true" :text="action.desc" />
+          <md-viewer :inline="true" :text="action.desc" :use-roller="true" />
         </li>
       </ul>
     </section>
@@ -191,7 +135,7 @@
           class="my-1"
         >
           <span class="font-bold after:content-['_']">{{ action.name }}. </span>
-          <md-viewer :inline="true" :text="action.desc" />
+          <md-viewer :inline="true" :text="action.desc" :use-roller="true" />
         </li>
       </ul>
     </section>
@@ -202,7 +146,7 @@
       <ul>
         <li v-for="action in monster.reactions" :key="action.name" class="my-1">
           <span class="font-bold after:content-['_']">{{ action.name }}. </span>
-          <md-viewer :inline="true" :text="action.desc" />
+          <md-viewer :inline="true" :text="action.desc" :use-roller="true" />
         </li>
       </ul>
     </section>
@@ -225,7 +169,6 @@
         </li>
       </ul>
     </section>
-
     <!-- Monster Mythic Actions -->
     <section v-if="monster.mythic_actions">
       <h2>Mythic Actions</h2>
@@ -279,7 +222,7 @@
       </span>
     </section>
 
-    <p class="text-sm italic">
+    <p class="mb-4 text-sm italic">
       Source:
       <a target="NONE" :href="monster.document__url">
         {{ monster.document__title }}
@@ -290,17 +233,8 @@
 </template>
 
 <script setup>
-const { data: monster } = useMonster(useRoute().params.id);
-
 const route = useRoute();
-
-// Helper functions
-const calcMod = (score) => Math.floor((score - 10) / 2);
-const formatMod = (mod) => (mod >= 0 ? '+' + mod.toString() : mod.toString());
-
-function uppercaseFirstLetter(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
+const { data: monster } = useMonster(route.params.id);
 
 const mode = ref(route.query.mode || 'normal');
 function toggleMode() {
@@ -359,3 +293,4 @@ function toggleMode() {
   margin-block: 0.5rem;
 }
 </style>
+<hr />

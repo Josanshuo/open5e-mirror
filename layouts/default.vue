@@ -1,6 +1,6 @@
 <template>
   <div class="overflow-hidden text-darkness">
-    <SourcesModal :show="showModal" @close="showModal = false" />
+    <sources-modal :show="showModal" @close="showModal = false" />
     <div
       class="grid h-screen w-screen grid-flow-col bg-white transition-all dark:bg-darkness sm:ml-0 sm:grid-cols-[14rem_1fr] sm:overflow-y-auto sm:transition-none"
       :class="showSidebar ? 'ml-0' : '-ml-56'"
@@ -73,6 +73,9 @@
           </li>
         </ul>
 
+        <!-- Report Issue UI -->
+        <report-issue />
+
         <!-- Patron Banner -->
         <a href="https://www.patreon.com/open5e">
           <img
@@ -101,6 +104,8 @@
           class="fixed left-0 top-0 z-48 h-full w-full bg-basalt/50 sm:hidden"
           @click="hideSidebar"
         />
+
+        <page-notifications />
 
         <!-- Main page content -->
         <nuxt-page
@@ -180,17 +185,24 @@ const title = computed(() => {
 useHead({ title: title });
 const searchText = ref($route.query.text);
 
-watch($route, () => {
-  showSidebar.value = false;
-});
+watch(
+  () => $route.path,
+  () => {
+    showSidebar.value = false;
+  }
+);
 
 const showModal = ref(false);
 const { sources } = useSourcesList();
 
 const no_selected_sources = computed(() => sources.value.length);
 const { data: documents } = useDocuments();
-const { data: classes } = useFindMany(API_ENDPOINTS.classes);
-const { data: races } = useFindMany(API_ENDPOINTS.races);
+const { data: classes } = useFindMany(API_ENDPOINTS.classes, {
+  fields: ['name', 'slug'].join(),
+});
+const { data: races } = useFindMany(API_ENDPOINTS.races, {
+  fields: ['name', 'slug'].join(),
+});
 const { data: combat_sections } = useSections('Combat');
 const { data: equipment_sections } = useSections('Equipment');
 const { data: gameplay_sections } = useSections('Gameplay Mechanics');

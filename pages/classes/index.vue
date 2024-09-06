@@ -1,20 +1,16 @@
 <template>
   <section class="docs-container container">
-    <h1>Classes</h1>
-    <div v-if="classes" class="docs-toc">
-      <ul>
-        <li v-for="charClass in classes" :key="charClass.slug">
-          <nuxt-link :to="`/classes/${charClass.slug}`">
-            {{ charClass.name }}
-          </nuxt-link>
-        </li>
-      </ul>
+    <div class="filter-header-wrapper">
+      <h1 class="filter-header">Classes</h1>
     </div>
+    <api-results-table
+      endpoint="classes"
+      :api-endpoint="API_ENDPOINTS.classes"
+      :cols="['document__title', 'document__slug']"
+    />
   </section>
 </template>
 
 <script setup>
-const { data: classes } = useFindMany(API_ENDPOINTS.classes);
+import ApiResultsTable from '~/components/ApiResultsTable.vue';
 </script>
-
-<style></style>

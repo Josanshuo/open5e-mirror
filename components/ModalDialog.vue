@@ -1,5 +1,5 @@
 <template>
-  <TransitionRoot as="template" :show="open">
+  <TransitionRoot as="template" :show="open" @key.escape="closeModal">
     <Dialog as="div" class="relative z-100" @close="closeModal">
       <TransitionChild
         as="template"
@@ -11,7 +11,7 @@
         leave-to="opacity-0"
       >
         <div
-          class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+          class="fixed inset-0 bg-gray-500/75 transition-opacity"
           @close="closeModal()"
         />
       </TransitionChild>
@@ -37,7 +37,7 @@
 
               <!-- Use 'actions' slot for modal buttons/etc -->
               <div
-                class="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3"
+                class="mt-5 grid grid-cols-1 gap-2 sm:mt-6 sm:grid-flow-row-dense sm:grid-cols-2"
                 :show="slots.actions"
               >
                 <slot name="actions" />
@@ -60,8 +60,6 @@ import {
 } from '@headlessui/vue';
 
 const slots = useSlots();
-import { defineProps, defineEmits } from 'vue';
-
 const props = defineProps({
   open: {
     type: Boolean,
@@ -72,6 +70,7 @@ const props = defineProps({
 const emits = defineEmits(['close', 'update:open']);
 
 const closeModal = () => {
+  emits('close', true);
   emits('update:open', false);
 };
 </script>

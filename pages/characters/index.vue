@@ -1,28 +1,21 @@
 <template>
   <section class="docs-container container">
-    <h1>Creating Characters</h1>
-
-    <div v-if="sections" class="docs-toc">
-      <ul>
-        <li v-for="section in sections" :key="section.slug">
-          <nuxt-link tag="a" :to="`/characters/${section.slug}`">
-            {{ section.name }}
-          </nuxt-link>
-        </li>
-      </ul>
+    <div class="filter-header-wrapper">
+      <h1 class="filter-header">Creating Characters</h1>
     </div>
-    <div v-else class="flex w-full flex-wrap pt-2 text-lg">
-      <div class="flex w-full">
-        There are no items for this category that align with the corresponding
-        sources you selected.
-      </div>
-      <div class="flex w-full pt-2">
-        Please edit your selected sources for more results.
-      </div>
-    </div>
+    <api-results-table
+      v-model="characterFilter"
+      endpoint="characters"
+      :api-endpoint="API_ENDPOINTS.sections"
+      :cols="['document__title', 'document__slug']"
+    />
   </section>
 </template>
 
 <script setup>
-const { data: sections } = useSections('Characters', 'Character Advancement');
+import ApiResultsTable from '~/components/ApiResultsTable.vue';
+
+const characterFilter = ref({
+  parent__in: 'Characters, Character Advancement',
+});
 </script>
