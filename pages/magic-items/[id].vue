@@ -6,9 +6,9 @@
       </h1>
       <p>
         <em>
-          {{ item.type }}, {{ item.rarity }}
+          {{ item.category.name }}, {{ item.rarity.name }}
           <span v-show="item.requires_attunement">
-            ({{ item.requires_attunement }})
+            ({{ 'requires attunement' }})
           </span>
         </em>
         <source-tag
@@ -20,19 +20,24 @@
       <md-viewer :text="item.desc" />
       <p class="text-sm italic">
         Source:
-        <a target="NONE" :href="item.document__url">
-          {{ item.document__title }}
+        <a
+          target="NONE"
+          :href="item.document.permalink"
+        >
+          {{ item.document.name }}
           <Icon name="heroicons:arrow-top-right-on-square-20-solid" />
         </a>
       </p>
     </div>
-    <p v-else>Loading...</p>
+    <p v-else>
+      Loading...
+    </p>
   </section>
 </template>
 
 <script setup>
 const { data: item } = useFindOne(
   API_ENDPOINTS.magicitems,
-  useRoute().params.id
+  useRoute().params.id,
 );
 </script>

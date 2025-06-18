@@ -1,22 +1,49 @@
 <template>
-  <main v-if="subclass" class="docs-container container">
-    <h1>
-      {{ subclass.name }}
-      <source-tag
-        :title="subclass.document__title"
-        :text="subclass.document__slug"
-      />
-    </h1>
+  <main
+    v-if="subclassData"
+    class="docs-container container"
+  >
+    <h1>{{ subclassData.name }}</h1>
+    <!-- CLASS ABILITIES -->
     <section>
-      <md-viewer :text="subclass.desc" />
+      <ul v-if="features.length > 0">
+        <li
+          v-for="feature in features"
+          :key="feature.key"
+        >
+          <h3>{{ feature.name }}</h3>
+          <md-viewer
+            :text="feature.desc"
+            :header-level="3"
+          />
+        </li>
+      </ul>
     </section>
   </main>
-  <p v-else>Loading...</p>
+
+  <p v-else>
+    Loading...
+  </p>
 </template>
 
 <script setup>
-const { data: subclass } = useSubclass(
-  useRoute().params.className,
-  useRoute().params.subclass
+const { data: subclassData } = useFindOne(
+  API_ENDPOINTS.classes,
+  useRoute().params.subclass,
+  {
+    params: {
+      is_subclass: true,
+      subclass_of: useRoute().params.className,
+      fields: ['name', 'key', 'features'].join(','),
+    },
+  },
 );
+
+const features = computed(() => {
+  const features = subclassData.value.features;
+  if (!features) return [];
+  return [...features].sort(
+    (a, b) => (a.gained_at?.[0]?.level ?? 1) - (b.gained_at?.[0]?.level ?? 1),
+  );
+});
 </script>

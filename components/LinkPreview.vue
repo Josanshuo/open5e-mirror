@@ -1,3 +1,16 @@
+<script>
+/**
+ * LinkPreview - A card that displays detailed information about a specific category of content.
+ *
+ *
+ * -= PROPS (INPUTS) =-
+ * @prop {String} category - What type of content the preview is linking to.
+ *   Different types of Open5e resources need different data in the preview
+ * @prop {Object} content - content to render on the card. varies with category
+ *
+ */
+</script>
+
 <template>
   <article
     class="absolute top--1 z-10 hidden h-max bg-slate-100 px-4 py-3 text-black shadow-md dark:bg-basalt dark:text-white md:group-hover:block"
@@ -13,15 +26,25 @@
     </p>
 
     <!-- Generate card body from data -->
-    <p v-for="item in body" :key="item.title" class="m-0 p-0 text-sm">
-      <span v-if="item.title" class="font-bold after:mr-1 after:content-[':']">
+    <p
+      v-for="item in body"
+      :key="item.title"
+      class="m-0 p-0 text-sm"
+    >
+      <span
+        v-if="item.title"
+        class="font-bold after:mr-1 after:content-[':']"
+      >
         {{ item.title }}
       </span>
       <span>{{ item.data }} </span>
     </p>
 
     <!-- Card footer -->
-    <p v-if="content.document__title" class="whitespace-nowrap text-sm italic">
+    <p
+      v-if="content.document__title"
+      class="whitespace-nowrap text-sm italic"
+    >
       Source: {{ content.document__title }}
     </p>
   </article>

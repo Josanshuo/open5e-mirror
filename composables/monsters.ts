@@ -1,57 +1,44 @@
+import { useQuery } from '@tanstack/vue-query';
+import { API_ENDPOINTS, useAPI } from './api';
+import { useFormatModifier } from './useFormatModifier';
+
 export type MonsterFilter = {
-  /** Name contains */
-  name__icontains?: string;
-  /** Challenge rating lower bound */
-  cr__gte?: string;
-  /** Challenge rating upper bound */
-  cr__lte?: string;
-  /** HP rating lower bound */
-  hit_points__gte?: string;
-  /** HP rating lower bound */
-  hit_points__lte?: string;
-  size?: string;
-  type?: string;
+  name__icontains?: string; // filter by name (TODO)
+  challenge_rating_decimal_gte?: string; // CR lower bound
+  challenge_rating_decimal__lte?: string; // CR upper bound
+  size?: string; // filter by size
+  type?: string; // filter by monster type (TODO)
 };
 
 export const DefaultMonsterFilter: Readonly<MonsterFilter> = {
   name__icontains: '',
-  cr__gte: '',
-  cr__lte: '',
-  hit_points__gte: '',
-  hit_points__lte: '',
+  challenge_rating_decimal_gte: '',
+  challenge_rating_decimal__lte: '',
   size: '',
   type: '',
 };
 
-export function copyDefaultMonsterFilter(): MonsterFilter {
-  return { ...DefaultMonsterFilter };
-}
-
+// Fetch a single monster from Open5e API
 export const useMonster = (slug: string) => {
   const { get } = useAPI();
   return useQuery({
     queryKey: ['get', API_ENDPOINTS.monsters, slug],
     queryFn: async () => {
       const monster = await get(API_ENDPOINTS.monsters, slug);
-      monster.abilities = ABILITY_SCORE_NAMES.map((ability) => ({
+      monster.abilities = ABILITY_SCORE_NAMES.map(ability => ({
         name: ability,
         shortName: ability.slice(0, 3),
         score: monster[ability],
-        modifier: formatMod(calcMod(monster[ability])),
+        modifier: useFormatModifier(
+          monster[ability] as string | number | undefined,
+          { inputType: 'score' },
+        ),
         save: monster[`${ability}_save`],
       }));
       return monster as Record<string, string>;
     },
   });
 };
-
-function calcMod(score: number) {
-  return Math.floor((score - 10) / 2);
-}
-
-function formatMod(mod: number) {
-  return mod >= 0 ? '+' + mod.toString() : mod.toString();
-}
 
 const ABILITY_SCORE_NAMES = [
   'strength',

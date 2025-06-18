@@ -1,7 +1,20 @@
-<!--
-  This component is global so that the markdown parser can see it and parse the
-  cross-link tags as components. There might be a better way to handle this
--->
+<script>
+/**
+ * CrossLink - An inline link to an Open5e resource. Fetches & displays a
+ *   preview of the linked resource when hovered
+ *
+ * -= PROPS (INPUTS) =-
+ * @prop {String} src - The source of the Open5e resource being linked to. The
+ *   resources endpoint and key can be extracted from it.
+ *
+ *
+ * -= DEPENDENCIES =-
+ * @component LinkPreview – Displays a preview of the linked content.
+ * @axios - Fetches API data (TODO: replace /w Vue Query)
+ *
+ */
+</script>
+
 <template>
   <nuxt-link
     v-if="acceptibleTypes.includes(category)"
@@ -10,11 +23,18 @@
     @mouseover="loadData"
   >
     <slot />
-    <link-preview v-if="content" :content="content" :category="category" />
+    <link-preview
+      v-if="content"
+      :content="content"
+      :category="category"
+    />
   </nuxt-link>
 
   <!-- If link markdown is invalid, render a span instead -->
-  <span v-else class="italic"><slot /></span>
+  <span
+    v-else
+    class="italic"
+  ><slot /></span>
 </template>
 
 <script setup>
@@ -26,10 +46,10 @@ const loading = ref(false);
 const content = ref(undefined);
 const acceptibleTypes = ref(Object.keys(paramsByType));
 const category = ref(
-  props.src.split('/').filter((crumb) => !['v1', 'v2'].includes(crumb))[0]
+  props.src.split('/').filter(crumb => !['v1', 'v2'].includes(crumb))[0],
 );
 const slug = ref(
-  props.src.split('/').filter((crumb) => !['v1', 'v2'].includes(crumb))[1]
+  props.src.split('/').filter(crumb => !['v1', 'v2'].includes(crumb))[1],
 );
 
 const url = computed(() => {
@@ -37,9 +57,7 @@ const url = computed(() => {
   const { altFrontEndSubroute, apiEndpoint } = paramsByType[category.value];
 
   // make sure that category has a recognised endpoint
-  if (!apiEndpoint) {
-    return { linkTarget: '/' };
-  }
+  if (!apiEndpoint) return { linkTarget: '/' };
 
   // FE uses section's parent for routing. Update url once data is fetched
   if (content.value && category.value === 'sections') {
@@ -70,33 +88,33 @@ async function loadData() {
 // Maps tag names from markdown to data required to show links/previews
 const defaultQueryParams = '?fields=name,document__title,';
 const paramsByType = {
-  armor: {
+  'armor': {
     apiEndpoint: 'armor',
     queryParams: defaultQueryParams + 'category',
   },
-  backgrounds: {
+  'backgrounds': {
     apiEndpoint: 'backgrounds',
     queryParams: defaultQueryParams,
   },
-  classes: {
+  'classes': {
     apiEndpoint: 'classes',
     queryParams: defaultQueryParams,
   },
-  combat: {
+  'combat': {
     altFrontEndSubroute: 'combat',
     apiEndpoint: 'sections',
     queryParams: defaultQueryParams + 'title',
   },
-  conditions: {
+  'conditions': {
     apiEndpoint: 'conditions',
     queryParams: defaultQueryParams + 'desc',
   },
-  equipment: {
+  'equipment': {
     altFrontEndSubroute: 'equipment',
     apiEndpoint: 'sections',
     queryParams: defaultQueryParams + 'parent',
   },
-  feats: {
+  'feats': {
     apiEndpoint: 'feats',
     queryParams: defaultQueryParams,
   },
@@ -105,44 +123,44 @@ const paramsByType = {
     apiEndpoint: 'sections',
     queryParams: defaultQueryParams + 'parent',
   },
-  magicitems: {
+  'magicitems': {
     altFrontEndSubroute: 'magic-items',
     apiEndpoint: 'magicitems',
     queryParams: defaultQueryParams + 'type,rarity,requires_attunement',
   },
-  monsters: {
+  'monsters': {
     apiEndpoint: 'monsters',
     queryParams: defaultQueryParams + 'size,type,challenge_rating',
   },
-  plane: {
+  'plane': {
     apiEndpoint: 'planes',
     queryParams: defaultQueryParams,
   },
-  races: {
+  'races': {
     apiEndpoint: 'races',
     queryParams: defaultQueryParams,
   },
-  running: {
+  'running': {
     altFrontEndSubroute: 'running',
     apiEndpoint: 'sections',
     queryParams: defaultQueryParams + 'parent',
   },
-  sections: {
+  'sections': {
     apiEndpoint: 'sections',
     queryParams: defaultQueryParams + 'parent',
   },
-  spells: {
+  'spells': {
     apiEndpoint: 'spells',
     queryParams:
-      defaultQueryParams +
-      'level,school,casting_time,duration,range,components',
+      defaultQueryParams
+      + 'level,school,casting_time,duration,range,components',
   },
-  spelllist: {
+  'spelllist': {
     altFrontEndSubroute: 'spells/by-class',
     apiEndpoint: 'spelllist',
     queryParams: defaultQueryParams,
   },
-  weapons: {
+  'weapons': {
     apiEndpoint: 'weapons',
     queryParams: defaultQueryParams + 'category',
   },
